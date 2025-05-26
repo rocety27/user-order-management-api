@@ -15,7 +15,8 @@ def create_user(user_in: UserCreate, db: Session = Depends(get_db)):
         return user
     except ValueError as ve:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(ve))
-    except Exception:
+    except Exception as e:
+        print(f"Unexpected error: {e}")  # Log error here
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Unexpected error occurred.")
 
 

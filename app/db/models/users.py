@@ -2,7 +2,8 @@ from sqlalchemy import Column, Integer, String, DateTime, func
 from sqlalchemy.orm import relationship, declarative_base
 from sqlalchemy.orm import Session
 from app.db.session import engine 
-Base = declarative_base()
+from app.db.models.orders import Order
+from app.db.base import Base
 
 class User(Base):
     __tablename__ = "users"
@@ -15,7 +16,7 @@ class User(Base):
     created_at = Column(DateTime, server_default=func.now(), nullable=False)
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now(), nullable=False)
 
-    orders = relationship("Order", back_populates="user", cascade="all, delete-orphan")
+    orders = relationship(Order, back_populates="user", cascade="all, delete-orphan")
 
 
 def create_tables():
