@@ -2,14 +2,14 @@
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from db.models import get_db
+from db import session
 from validators.users import UserCreate, UserOut
 from services.users import create_user_service
 
 router = APIRouter()
 
 @router.post("/", summary="Create a new user (Admin only)", response_model=UserOut)
-def create_user(user_in: UserCreate, db: Session = Depends(get_db)):
+def create_user(user_in: UserCreate, db: Session = Depends(session.get_db)):
     try:
         user = create_user_service(db, user_in)
         return user
