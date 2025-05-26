@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
-from validators.users import UserCreate
-from db.models.users import get_user_by_email, get_user_by_username, create_user as db_create_user
-from utils.security import hash_password
+from app.validators.users import UserCreate
+from app.db.models.users import get_user_by_email, get_user_by_username, create_user as db_create_user
+from app.utils.security import hash_password
 
 def create_user_service(db: Session, user_in: UserCreate):
     # Check if user exists by email or username

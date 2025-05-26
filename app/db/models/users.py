@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, DateTime, func
-from sqlalchemy.orm import relationship, Session
-from sqlalchemy.orm import declarative_base
-
+from sqlalchemy.orm import relationship, declarative_base
+from sqlalchemy.orm import Session
+from app.db.session import engine 
 Base = declarative_base()
 
 class User(Base):
@@ -17,9 +17,12 @@ class User(Base):
 
     orders = relationship("Order", back_populates="user", cascade="all, delete-orphan")
 
-# --- DB interaction functions ---
 
-from sqlalchemy.orm import Session
+def create_tables():
+    Base.metadata.create_all(bind=engine)
+
+
+# --- DB interaction functions ---
 
 def get_user_by_id(db: Session, user_id: int):
     return db.query(User).filter(User.id == user_id).first()
