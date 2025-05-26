@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.routers import users
+from app.routers import users, auth
 from app.db.models.users import create_tables  # import the table creation func
 
 app = FastAPI(
@@ -8,6 +8,7 @@ app = FastAPI(
 )
 
 app.include_router(users.router, prefix="/users", tags=["Users"])
+app.include_router(auth.router, prefix="/auth", tags=["Auth"])
 
 @app.on_event("startup")
 def on_startup():
