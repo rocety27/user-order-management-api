@@ -5,6 +5,9 @@ from sqlalchemy.orm import Session
 from app.db.session import get_db
 from app.validators.users import UserCreate, UserOut
 from app.services.users import create_user_service
+from app.services.users import list_users_service
+from typing import List
+
 
 router = APIRouter()
 
@@ -19,11 +22,15 @@ def create_user(user_in: UserCreate, db: Session = Depends(get_db)):
         print(f"Unexpected error: {e}")  # Log error here
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Unexpected error occurred.")
 
+@router.get("/", summary="List all users (Admin only)", response_model=List[UserOut])
+def list_users(db: Session = Depends(get_db)):
+    try:
+        users = list_users_service(db)
+        return users
+    except Exception as e:
+        print(f"Unexpected error: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Unexpected error occurred.")
 
-@router.get("/", summary="List all users (Admin only)")
-def list_users():
-    # Only Admins allowed
-    pass
 
 @router.get("/me", summary="Get current user's profile")
 def get_me():

@@ -45,3 +45,6 @@ def create_user(db: Session, username: str, email: str, hashed_password: str, ro
     db.commit()
     db.refresh(user)
     return user
+
+def get_all_users(db: Session):
+    return db.query(User).all()

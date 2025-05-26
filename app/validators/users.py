@@ -1,5 +1,6 @@
 from pydantic import BaseModel, EmailStr, constr
 from typing import Annotated
+from datetime import datetime
 
 class UserCreate(BaseModel):
     username: Annotated[str, constr(min_length=3, max_length=255)]
@@ -7,8 +8,6 @@ class UserCreate(BaseModel):
     password: Annotated[str, constr(min_length=6, max_length=255)]
     role: str = "customer"
 
-from pydantic import BaseModel, EmailStr
-from datetime import datetime
 
 class UserOut(BaseModel):
     id: int

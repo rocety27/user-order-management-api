@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 from app.validators.users import UserCreate
 from app.db.models.users import get_user_by_email, get_user_by_username, create_user as db_create_user
+from app.db.models.users import get_all_users 
 from app.utils.security import hash_password
 
 def create_user_service(db: Session, user_in: UserCreate):
@@ -22,3 +23,6 @@ def create_user_service(db: Session, user_in: UserCreate):
         hashed_password=hashed_pw,
         role=user_in.role
     )
+
+def list_users_service(db: Session):
+    return get_all_users(db)
