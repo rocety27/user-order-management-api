@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from app.validators.users import UserCreate
-from app.db.models.users import get_user_by_email, get_user_by_username, create_user as db_create_user
-from app.db.models.users import get_all_users 
+from app.db.models.users import get_user_by_email, get_user_by_username, create_user as db_create_user, get_all_users, get_user_by_id 
+from fastapi import HTTPException, status
 from app.utils.security import hash_password
 
 def create_user_service(db: Session, user_in: UserCreate):
@@ -26,3 +26,10 @@ def create_user_service(db: Session, user_in: UserCreate):
 
 def list_users_service(db: Session):
     return get_all_users(db)
+
+
+def get_user_service(db: Session, user_id: int):
+    user = get_user_by_id(db, user_id)
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+    return user

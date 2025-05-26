@@ -4,10 +4,8 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from app.db.session import get_db
 from app.validators.users import UserCreate, UserOut
-from app.services.users import create_user_service
-from app.services.users import list_users_service
+from app.services.users import create_user_service, list_users_service, get_user_service
 from typing import List
-
 
 router = APIRouter()
 
@@ -42,10 +40,16 @@ def update_me(user_update: dict):
     # Customer only
     pass
 
-@router.get("/{user_id}", summary="Get user by ID")
-def get_user(user_id: int):
-    # Admin or Customer (own)
-    pass
+@router.get("/{user_id}", summary="Get user by ID", response_model=UserOut)
+def get_user(user_id: int, db: Session = Depends(get_db)):
+    try:
+        user = get_user_service(db, user_id)
+        return user
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        print(f"Unexpected error: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Unexpected error occurred.")
 
 @router.put("/{user_id}", summary="Update user by ID")
 def update_user(user_id: int, user_update: dict):
