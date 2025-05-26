@@ -1,10 +1,11 @@
 # --- User Endpoints ---
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 from app.db.session import get_db
 from app.validators.users import UserCreate, UserOut
-from app.services.users import create_user_service, list_users_service, get_user_service
+from app.services.users import create_user_service, list_users_service, get_user_service, delete_user_service
 from typing import List
 
 router = APIRouter()
@@ -17,7 +18,7 @@ def create_user(user_in: UserCreate, db: Session = Depends(get_db)):
     except ValueError as ve:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(ve))
     except Exception as e:
-        print(f"Unexpected error: {e}")  # Log error here
+        print(f"Unexpected error: {e}")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Unexpected error occurred.")
 
 @router.get("/", summary="List all users (Admin only)", response_model=List[UserOut])
@@ -28,7 +29,6 @@ def list_users(db: Session = Depends(get_db)):
     except Exception as e:
         print(f"Unexpected error: {e}")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Unexpected error occurred.")
-
 
 @router.get("/me", summary="Get current user's profile")
 def get_me():
@@ -56,10 +56,20 @@ def update_user(user_id: int, user_update: dict):
     # Admin or Customer (own)
     pass
 
-@router.delete("/{user_id}", summary="Delete user by ID")
-def delete_user(user_id: int):
-    # Admin only
-    pass
+
+@router.delete("/{user_id}", summary="Delete user by ID", status_code=200)
+def delete_user(user_id: int, db: Session = Depends(get_db)):
+    try:
+        delete_user_service(db, user_id)
+        return JSONResponse(content={"message": f"User with ID {user_id} deleted successfully."})
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        print(f"Unexpected error: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Unexpected error occurred."
+        )
 
 @router.get("/{user_id}/orders", summary="List orders by user (Admin only)")
 def list_user_orders(user_id: int):
