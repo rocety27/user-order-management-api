@@ -1,14 +1,23 @@
+# --- User Endpoints ---
+
 from fastapi import APIRouter, Depends, HTTPException, status
-from typing import List, Optional
+from sqlalchemy.orm import Session
+from db.models import get_db
+from validators.users import UserCreate, UserOut
+from services.users import create_user_service
 
 router = APIRouter()
 
-# --- User Endpoints ---
+@router.post("/", summary="Create a new user (Admin only)", response_model=UserOut)
+def create_user(user_in: UserCreate, db: Session = Depends(get_db)):
+    try:
+        user = create_user_service(db, user_in)
+        return user
+    except ValueError as ve:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(ve))
+    except Exception:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Unexpected error occurred.")
 
-@router.post("/", summary="Create a new user (Admin only)")
-def create_user(user_in: dict):
-    # Only Admins allowed
-    pass
 
 @router.get("/", summary="List all users (Admin only)")
 def list_users():
