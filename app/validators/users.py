@@ -7,6 +7,7 @@ class UserCreate(BaseModel):
     password: Annotated[str, constr(min_length=6, max_length=255)]
     role: str = "customer"
 
+
 class UserOut(BaseModel):
     id: int
     username: str
