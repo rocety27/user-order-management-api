@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 from app.routers import users, auth
-from app.db.models.users import create_tables  # import the table creation func
+from dotenv import load_dotenv
+
+load_dotenv()  # Load env variables early
 
 app = FastAPI(
     title="User Order Management API",
@@ -12,8 +14,7 @@ app.include_router(auth.router, prefix="/auth", tags=["Auth"])
 
 @app.on_event("startup")
 def on_startup():
-    create_tables()  # create tables if not exist
-    print("✅ Database tables are ready.")
+    print("🚀 App starting up...")
 
 @app.on_event("shutdown")
 def on_shutdown():
