@@ -44,7 +44,7 @@ def create_user(
 @router.get("/", summary="List all users", response_model=List[UserOut])
 def list_users(
     db: Session = Depends(get_db),
-    current_user: TokenData = Depends(permission_required("list_users")),
+    current_user: TokenData = Depends(permission_required("can_list_users")),
 ):
     try:
         users = list_users_service(db)
