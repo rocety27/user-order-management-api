@@ -18,8 +18,8 @@ from app.db.base import Base
 def import_all_models():
     # Correct the path to the models directory
     models_dir = os.path.join(os.path.dirname(__file__), "../models")
-    models_dir = os.path.abspath(models_dir)  # Ensure it's an absolute path
-
+    models_dir = os.path.abspath(models_dir)  
+    
     for filename in os.listdir(models_dir):
         if filename.endswith(".py") and filename != "__init__.py":
             module_name = f"app.db.models.{filename[:-3]}"

@@ -1,4 +1,3 @@
-# app/db/models/rule.py
 from sqlalchemy import Column, String, ForeignKey
 from sqlalchemy.orm import relationship
 from app.db.base import Base

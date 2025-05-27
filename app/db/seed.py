@@ -7,7 +7,16 @@ from app.utils.hashing import hash_password
 
 import os
 from dotenv import load_dotenv
+
 load_dotenv()
+
+from sqlalchemy import text
+
+def clear_tables(db):
+    # Truncate with restart identity to reset auto-increment IDs
+    db.execute(text("TRUNCATE TABLE rules, permissions, roles, users RESTART IDENTITY CASCADE"))
+    db.commit()
+
 
 def seed_roles(db):
     roles = [
@@ -30,9 +39,9 @@ def seed_permissions(db):
         Permission(name="can_get_user"),
         Permission(name="can_update_user"),
         Permission(name="can_delete_user"),
-        
-        #Permission(name="can_get_own_profile"),
-        #Permission(name="can_update_own_profile"),
+
+        Permission(name="can_get_own_profile"),
+        Permission(name="can_update_own_profile"),
     ]
     for perm in permissions:
         existing = db.query(Permission).filter(Permission.name == perm.name).first()
@@ -52,30 +61,32 @@ def seed_rules(db):
     can_get_user = db.query(Permission).filter(Permission.name == "can_get_user").first()
     can_update_user = db.query(Permission).filter(Permission.name == "can_update_user").first()
     can_delete_user = db.query(Permission).filter(Permission.name == "can_delete_user").first()
+    
+    can_get_own_profile = db.query(Permission).filter(Permission.name == "can_get_own_profile").first()
+    can_update_own_profile = db.query(Permission).filter(Permission.name == "can_update_own_profile").first()
 
     rules = [
         # Admin permissions - full user management
-        Rule(role_id=admin_role.id, permission_id=can_create_user.id),
-        Rule(role_id=admin_role.id, permission_id=can_list_users.id),
-        Rule(role_id=admin_role.id, permission_id=can_get_user.id),
-        Rule(role_id=admin_role.id, permission_id=can_update_user.id),
-        Rule(role_id=admin_role.id, permission_id=can_delete_user.id),
+        Rule(role_name=admin_role.name, permission_name=can_create_user.name),
+        Rule(role_name=admin_role.name, permission_name=can_list_users.name),
+        Rule(role_name=admin_role.name, permission_name=can_get_user.name),
+        Rule(role_name=admin_role.name, permission_name=can_update_user.name),
+        Rule(role_name=admin_role.name, permission_name=can_delete_user.name),
 
         # Customer permissions - maybe limited or none here
-        # Rule(role_id=customer_role.id, permission_id=can_get_own_profile.id),
-        # Rule(role_id=customer_role.id, permission_id=can_update_own_profile.id),
+        Rule(role_name=customer_role.name, permission_name=can_get_own_profile.name),
+        Rule(role_name=customer_role.name, permission_name=can_update_own_profile.name),
     ]
 
     for rule in rules:
         existing = db.query(Rule).filter(
-            Rule.role_id == rule.role_id,
-            Rule.permission_id == rule.permission_id
+            Rule.role_name == rule.role_name,
+            Rule.permission_name == rule.permission_name
         ).first()
         if not existing:
             db.add(rule)
 
     db.commit()
-
 
 
 def seed_admin_user(db):
@@ -99,9 +110,11 @@ def seed_admin_user(db):
     db.commit()
     print("Admin user created.")
 
+
 def seed_all():
     db = SessionLocal()
     try:
+        clear_tables(db)  
         seed_roles(db)
         seed_permissions(db)
         seed_rules(db)
