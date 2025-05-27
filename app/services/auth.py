@@ -1,19 +1,10 @@
-from passlib.context import CryptContext
 from datetime import timedelta
 from app.utils.jwt import create_access_token
-from app.services.users import get_user_by_username
+from app.db.crud.auth import get_user_by_username, get_permissions_for_role
 from sqlalchemy.orm import Session
 from app.db.models.rules import Rule
 from datetime import timedelta
-
-
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
-def hash_password(password: str) -> str:
-    return pwd_context.hash(password)
-
-def verify_password(plain_password: str, hashed_password: str) -> bool:
-    return pwd_context.verify(plain_password, hashed_password)
+from app.utils.security import verify_password
 
 def authenticate_user(db, username: str, password: str):
     user = get_user_by_username(db, username)
