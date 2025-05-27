@@ -1,7 +1,6 @@
-from sqlalchemy import Column, Integer, String, DateTime, func
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, func
 from sqlalchemy.orm import relationship
 from app.db.base import Base
-from app.db.models.orders import Order
 
 class User(Base):
     __tablename__ = "users"
@@ -10,8 +9,9 @@ class User(Base):
     username = Column(String(255), unique=True, nullable=False)
     email = Column(String(255), unique=True, nullable=False)
     hashed_password = Column(String(255), nullable=False)
-    role = Column(String(50), nullable=False, default="customer")
+    role_name = Column(String(50), ForeignKey("roles.name"), nullable=False, default="customer")
     created_at = Column(DateTime, server_default=func.now(), nullable=False)
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now(), nullable=False)
 
-    orders = relationship(Order, back_populates="user", cascade="all, delete-orphan")
+    role = relationship("Role", back_populates="users")
+    orders = relationship("Order", back_populates="user", cascade="all, delete-orphan")  # Use string reference

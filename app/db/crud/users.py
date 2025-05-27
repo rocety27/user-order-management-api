@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
-from app.db.models.users import User
+from app.db.models import User
 from app.validators.users import UserUpdate
 
 def get_user_by_id(db: Session, user_id: int) -> User | None:
