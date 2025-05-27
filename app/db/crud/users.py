@@ -16,16 +16,18 @@ def get_all_users(db: Session):
     return db.query(User).all()
 
 def create_user(db: Session, username: str, email: str, hashed_password: str, role: str = "customer") -> User:
+    print("hehehehe1")
     user = User(
         username=username,
         email=email,
         hashed_password=hashed_password,
-        role=role
+        role_name=role
     )
+    print("hehehehe2")
     db.add(user)
     db.commit()
-    db.refresh(user)
-    return user
+    db.refresh(user)  # <-- important to reload with DB generated fields
+    return user  # <-- return the User instance, NOT a string or id
 
 def update_user_db(db: Session, user_id: int, user_update: UserUpdate):
     user = get_user_by_id(db, user_id)

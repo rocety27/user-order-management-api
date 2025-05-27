@@ -27,7 +27,7 @@ router = APIRouter()
 def create_user(
     user_in: UserCreate,
     db: Session = Depends(get_db),
-    current_user: TokenData = Depends(permission_required("create_user")),
+    current_user: TokenData = Depends(permission_required("can_create_user")),
 ):
     try:
         user = create_user_service(db, user_in)

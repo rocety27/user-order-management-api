@@ -14,7 +14,7 @@ def create_user_service(db: Session, user_in: UserCreate):
 
     # Hash the password
     hashed_pw = hash_password(user_in.password)
-
+    print("HEHEHEHHEHEHE")
     # Create user in DB
     return db_create_user(
         db=db,
