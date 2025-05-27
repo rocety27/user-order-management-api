@@ -1,27 +1,20 @@
-# main.py
-
 from fastapi import FastAPI
-#from app.config.settings import settings  # assuming you have a settings.py
-#from app.db.database import init_db  # DB session maker or init logic
-from app.routers import user  # adjust as per your actual router files
+from app.routers import users, auth
+from app.db.models.users import create_tables  # import the table creation func
 
 app = FastAPI(
     title="User Order Management API",
     version="1.0.0",
-    #description="FastAPI with SQLAlchemy, Alembic, and Pydantic."
 )
 
-# Routers
-app.include_router(user.router, prefix="/users", tags=["Users"])  
+app.include_router(users.router, prefix="/users", tags=["Users"])
+app.include_router(auth.router, prefix="/auth", tags=["Auth"])
 
-# Startup Event
-@app.lifespan("startup")
-async def on_startup():
-    #init_db()
-    print("✅ App started and DB initialized.")
+@app.on_event("startup")
+def on_startup():
+    create_tables()  # create tables if not exist
+    print("✅ Database tables are ready.")
 
-# Shutdown Event
-@app.lifespan("shutdown")
-async def on_shutdown():
+@app.on_event("shutdown")
+def on_shutdown():
     print("🛑 App shutting down.")
-
