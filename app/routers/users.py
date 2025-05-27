@@ -1,8 +1,13 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, HTTPException, status, Depends
 from fastapi.responses import JSONResponse
+from typing import List
+
 from sqlalchemy.orm import Session
 from app.db.session import get_db
-from app.validators.users import UserCreate, UserUpdate, UserOut, TokenData
+
+from app.validators.users import UserCreate, UserUpdate, UserOut
+from app.validators.auth import TokenData
+
 from app.services.users import (
     create_user_service,
     list_users_service,
@@ -10,8 +15,11 @@ from app.services.users import (
     delete_user_service,
     update_user_service,
 )
-from typing import List
-from app.utils.jwt import get_current_user, admin_required
+
+from app.utils.jwt import (
+    get_current_user,
+    admin_required,
+)
 
 router = APIRouter()
 
