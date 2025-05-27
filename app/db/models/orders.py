@@ -1,6 +1,5 @@
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Numeric, func
-from sqlalchemy.orm import relationship, Session
-from sqlalchemy.orm import declarative_base
+from sqlalchemy.orm import relationship
 from app.db.base import Base
 
 class Order(Base):
@@ -15,15 +14,3 @@ class Order(Base):
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
 
     user = relationship("User", back_populates="orders")
-
-# --- DB interaction functions ---
-
-def get_order_by_id(db: Session, order_id: int):
-    return db.query(Order).filter(Order.id == order_id).first()
-
-def create_order(db: Session, user_id: int, total_amount, status: str = "pending"):
-    order = Order(user_id=user_id, total_amount=total_amount, status=status)
-    db.add(order)
-    db.commit()
-    db.refresh(order)
-    return order

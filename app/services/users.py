@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from app.validators.users import UserCreate, UserUpdate
-from app.db.models.users import get_user_by_email, get_user_by_username, create_user as db_create_user, get_all_users, get_user_by_id, delete_user_by_id, update_user_db
+from app.db.crud.users import get_user_by_email, get_user_by_username, create_user as db_create_user, get_all_users, get_user_by_id, delete_user_by_id, update_user_db
 from fastapi import HTTPException, status
 from app.utils.hashing import hash_password
 
