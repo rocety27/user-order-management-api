@@ -5,6 +5,7 @@ from app.db.session import get_db
 from app.services.auth import authenticate_user, get_permissions_for_role
 from app.utils.jwt import create_access_token, create_refresh_token, decode_token
 from app.db.models import User
+from app.validators.auth import RefreshTokenRequest
 
 router = APIRouter()
 
@@ -35,22 +36,22 @@ def login(
         "token_type": "bearer"
     }
 
-
 @router.post("/refresh")
-def refresh_token(refresh_token: str, db: Session = Depends(get_db)):
-    payload = decode_token(refresh_token)
+def refresh_token(
+    data: RefreshTokenRequest,
+    db: Session = Depends(get_db)
+):
+    payload = decode_token(data.refresh_token)
 
     if payload.get("type") != "refresh":
         raise HTTPException(status_code=400, detail="Invalid token type")
 
     user_id = int(payload.get("sub"))
 
-    # Fetch fresh user info from DB
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
 
-    # Fetch permissions fresh from DB
     permissions = get_permissions_for_role(db, user.role_name)
 
     user_data = {

@@ -5,3 +5,7 @@ class TokenData(BaseModel):
     user_id: int
     role: str
     permissions: List[str]
+    
+
+class RefreshTokenRequest(BaseModel):
+    refresh_token: str
