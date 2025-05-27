@@ -2,6 +2,10 @@ from passlib.context import CryptContext
 from datetime import timedelta
 from app.utils.jwt import create_access_token
 from app.services.users import get_user_by_username
+from sqlalchemy.orm import Session
+from app.db.models.rules import Rule
+from datetime import timedelta
+
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -24,3 +28,27 @@ def create_token_for_user(user):
     access_token_expires = timedelta(minutes=60)
     token = create_access_token(token_data, expires_delta=access_token_expires)
     return token
+
+def get_permissions_for_role(db: Session, role_name: str) -> list[str]:
+    permissions = (
+        db.query(Rule.permission_name)
+        .filter(Rule.role_name == role_name)
+        .all()
+    )
+    return [perm.permission_name for perm in permissions]
+
+def create_token_for_user(db: Session, user):
+    # Fetch permissions from DB
+    permissions = get_permissions_for_role(db, user.role_name)
+
+    token_data = {
+        "sub": str(user.id),
+        "role": user.role_name,
+        "permissions": permissions,
+    }
+
+    # Set token expiry, e.g. 15 minutes
+    expires_delta = timedelta(minutes=15)
+
+    access_token = create_access_token(token_data, expires_delta)
+    return access_token
