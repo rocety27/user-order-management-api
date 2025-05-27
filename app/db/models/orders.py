@@ -1,7 +1,6 @@
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Numeric, func
 from sqlalchemy.orm import relationship
 from app.db.base import Base
-#from app.db.models.users import User
 
 class Order(Base):
     __tablename__ = "orders"

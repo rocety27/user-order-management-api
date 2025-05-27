@@ -4,9 +4,9 @@ from sqlalchemy.orm import Session
 from app.db.session import get_db
 from app.services.auth import authenticate_user, get_permissions_for_role
 from app.utils.jwt import create_access_token, create_refresh_token, decode_token
-from app.db.models.users import User
+from app.db.models import User
 
-router = APIRouter(prefix="/auth")
+router = APIRouter()
 
 @router.post("/login")
 def login(

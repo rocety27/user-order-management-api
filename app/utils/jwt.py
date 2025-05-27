@@ -5,6 +5,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jwt import PyJWTError
 from app.validators.auth import TokenData
+from typing import Callable
 
 JWT_SECRET = os.getenv("JWT_SECRET", "your-secret")
 JWT_ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
@@ -23,10 +24,12 @@ def create_access_token(user: dict) -> str:
         data={
             "sub": str(user["id"]),
             "role": user["role"],
+            "permissions": user.get("permissions", []),
             "type": "access"
         },
         expires_delta=datetime.timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     )
+
 
 def create_refresh_token(user: dict) -> str:
     return create_token(
@@ -52,15 +55,23 @@ def get_current_user(token: str = Depends(oauth2_scheme)) -> TokenData:
     payload = decode_token(token)
     if payload.get("type") != "access":
         raise HTTPException(status_code=400, detail="Invalid token type")
+    
     user_id = int(payload.get("sub"))
     role = payload.get("role")
+    permissions = payload.get("permissions", [])
+
     if user_id is None or role is None:
         raise HTTPException(status_code=401, detail="Invalid token payload")
-    return TokenData(user_id=user_id, role=role)
 
-def admin_required(current_user: TokenData = Depends(get_current_user)):
-    if current_user.role != "admin":
-        raise HTTPException(status_code=403, detail="Admin privileges required.")
-    return current_user
+    return TokenData(user_id=user_id, role=role, permissions=permissions)
 
 
+def permission_required(permission: str) -> Callable:
+    def _permission_dependency(current_user: TokenData = Depends(get_current_user)) -> TokenData:
+        if permission not in current_user.permissions:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"Permission '{permission}' required."
+            )
+        return current_user
+    return _permission_dependency

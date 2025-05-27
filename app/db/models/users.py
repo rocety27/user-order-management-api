@@ -1,8 +1,6 @@
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, func
 from sqlalchemy.orm import relationship
 from app.db.base import Base
-from app.db.models.roles import Role
-from app.db.models.orders import Order  # Import Order model for relationship
 
 class User(Base):
     __tablename__ = "users"
@@ -15,5 +13,5 @@ class User(Base):
     created_at = Column(DateTime, server_default=func.now(), nullable=False)
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now(), nullable=False)
 
-    role = relationship(Role, back_populates="users")
-    orders = relationship(Order, back_populates="user", cascade="all, delete-orphan")  # Use string reference
+    role = relationship("Role", back_populates="users")
+    orders = relationship("Order", back_populates="user", cascade="all, delete-orphan")  # Use string reference

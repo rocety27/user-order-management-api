@@ -18,16 +18,16 @@ from app.services.users import (
 
 from app.utils.jwt import (
     get_current_user,
-    admin_required,
+    permission_required,
 )
 
 router = APIRouter()
 
-@router.post("/", summary="Create a new user (Admin only)", response_model=UserOut)
+@router.post("/", summary="Create a new user", response_model=UserOut)
 def create_user(
     user_in: UserCreate,
     db: Session = Depends(get_db),
-    current_user: TokenData = Depends(admin_required),
+    current_user: TokenData = Depends(permission_required("create_user")),
 ):
     try:
         user = create_user_service(db, user_in)
@@ -41,10 +41,10 @@ def create_user(
             detail="Unexpected error occurred.",
         )
 
-
-@router.get("/", summary="List all users (Admin only)", response_model=List[UserOut])
+@router.get("/", summary="List all users", response_model=List[UserOut])
 def list_users(
-    db: Session = Depends(get_db), current_user: TokenData = Depends(admin_required)
+    db: Session = Depends(get_db),
+    current_user: TokenData = Depends(permission_required("list_users")),
 ):
     try:
         users = list_users_service(db)
@@ -56,10 +56,10 @@ def list_users(
             detail="Unexpected error occurred.",
         )
 
-
 @router.get("/me", summary="Get current user's profile", response_model=UserOut)
 def get_me(
-    db: Session = Depends(get_db), current_user: TokenData = Depends(get_current_user)
+    db: Session = Depends(get_db),
+    current_user: TokenData = Depends(get_current_user),
 ):
     try:
         user = get_user_service(db, current_user.user_id)
@@ -72,7 +72,6 @@ def get_me(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Unexpected error occurred.",
         )
-
 
 @router.put("/me", summary="Update current user's profile", response_model=UserOut)
 def update_me(
@@ -92,15 +91,13 @@ def update_me(
             detail="Unexpected error occurred.",
         )
 
-
 @router.get("/{user_id}", summary="Get user by ID", response_model=UserOut)
 def get_user(
     user_id: int,
     db: Session = Depends(get_db),
     current_user: TokenData = Depends(get_current_user),
 ):
-    # Admin or user themself allowed
-    if current_user.role != "admin" and current_user.user_id != user_id:
+    if "get_any_user" not in current_user.permissions and current_user.user_id != user_id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Access denied.",
@@ -117,7 +114,6 @@ def get_user(
             detail="Unexpected error occurred.",
         )
 
-
 @router.put("/{user_id}", summary="Update user by ID", response_model=UserOut)
 def update_user(
     user_id: int,
@@ -125,8 +121,7 @@ def update_user(
     db: Session = Depends(get_db),
     current_user: TokenData = Depends(get_current_user),
 ):
-    # Admin or user themself allowed
-    if current_user.role != "admin" and current_user.user_id != user_id:
+    if "update_any_user" not in current_user.permissions and current_user.user_id != user_id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Access denied.",
@@ -143,12 +138,11 @@ def update_user(
             detail="Unexpected error occurred.",
         )
 
-
 @router.delete("/{user_id}", summary="Delete user by ID", status_code=200)
 def delete_user(
     user_id: int,
     db: Session = Depends(get_db),
-    current_user: TokenData = Depends(admin_required),
+    current_user: TokenData = Depends(permission_required("delete_user")),
 ):
     try:
         delete_user_service(db, user_id)
@@ -164,9 +158,10 @@ def delete_user(
             detail="Unexpected error occurred.",
         )
 
-@router.get("/{user_id}/orders", summary="List orders by user (Admin only)")
-def list_user_orders(
-    user_id: int, current_user: TokenData = Depends(admin_required)
-):
-    # Implement orders fetching logic here, admin only
-    pass
+
+# @router.get("/{user_id}/orders", summary="List orders by user (Admin only)")
+# def list_user_orders(
+#     user_id: int, current_user: TokenData = Depends(admin_required)
+# ):
+#     # Implement orders fetching logic here, admin only
+#     pass

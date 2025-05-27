@@ -1,16 +1,14 @@
 from app.db.session import SessionLocal
 from app.db.models.roles import Role
 from app.db.models.permissions import Permission
-from app.db.models.rules import Rule
-from app.db.models.users import User
-from app.utils.hashing import hash_password
+from app.db.models import Rule, User
+from app.utils.security import hash_password
 
 import os
 from dotenv import load_dotenv
-
-load_dotenv()
-
 from sqlalchemy import text
+
+load_dotenv() # Load environment variables from .env file
 
 def clear_tables(db):
     # Truncate with restart identity to reset auto-increment IDs
