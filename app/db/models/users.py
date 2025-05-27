@@ -1,6 +1,5 @@
 from sqlalchemy import Column, Integer, String, DateTime, func
-from sqlalchemy.orm import relationship, Session
-from app.db.session import engine 
+from sqlalchemy.orm import relationship, Session 
 from app.db.models.orders import Order
 from app.db.base import Base
 from fastapi import HTTPException, status
@@ -18,11 +17,6 @@ class User(Base):
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now(), nullable=False)
 
     orders = relationship(Order, back_populates="user", cascade="all, delete-orphan")
-
-
-def create_tables():
-    Base.metadata.create_all(bind=engine)
-
 
 # --- DB interaction functions ---
 

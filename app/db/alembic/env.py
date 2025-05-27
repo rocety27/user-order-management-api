@@ -1,4 +1,5 @@
 import os
+import importlib
 from logging.config import fileConfig
 from sqlalchemy import engine_from_config, pool
 from alembic import context
@@ -13,8 +14,21 @@ if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
 from app.db.base import Base
-target_metadata = Base.metadata
 
+def import_all_models():
+    # Correct the path to the models directory
+    models_dir = os.path.join(os.path.dirname(__file__), "../models")
+    models_dir = os.path.abspath(models_dir)  # Ensure it's an absolute path
+
+    for filename in os.listdir(models_dir):
+        if filename.endswith(".py") and filename != "__init__.py":
+            module_name = f"app.db.models.{filename[:-3]}"
+            importlib.import_module(module_name)
+
+# Import all models to register them with Base
+import_all_models()
+
+target_metadata = Base.metadata
 
 def get_db_url():
     user = os.getenv("POSTGRES_USER")         
