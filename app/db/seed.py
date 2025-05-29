@@ -118,9 +118,9 @@ def seed_admin_user(db):
 def seed_customer_users(db, n=3):
     customer_role = db.query(Role).filter(Role.name == "customer").first()
     
-    customer_usernames = [f"customer{x}" for x in range(n)]
-    customer_emails = [f"customer{x}@example.com" for x in range(n)]
-    customer_passwords = [f"password{x}" for x in range(n)]
+    customer_usernames = [f"customer{x}" for x in range(1, n+1)]
+    customer_emails = [f"customer{x}@example.com" for x in range(1,n+1)]
+    customer_passwords = [f"password{x}" for x in range(1, n+1)]
 
     for customer_username, customer_email, customer_password in zip(customer_usernames, customer_emails, customer_passwords):
         customer_user = User(
@@ -143,7 +143,7 @@ def seed_all():
         seed_rules(db)
         seed_admin_user(db)
         seed_customer_users(db, n=3)
-        
+
     finally:
         db.close()
 

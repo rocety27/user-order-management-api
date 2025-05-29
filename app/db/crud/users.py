@@ -26,8 +26,8 @@ def create_user(db: Session, username: str, email: str, hashed_password: str, ro
     print("hehehehe2")
     db.add(user)
     db.commit()
-    db.refresh(user)  # <-- important to reload with DB generated fields
-    return user  # <-- return the User instance, NOT a string or id
+    db.refresh(user)
+    return user
 
 def update_user_db(db: Session, user_id: int, user_update: UserUpdate):
     user = get_user_by_id(db, user_id)
