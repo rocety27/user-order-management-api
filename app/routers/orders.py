@@ -13,7 +13,7 @@ from app.services.orders import (
     list_orders_service,
     list_my_orders_service,
     get_order_service,
-    # update_order_service,
+    update_order_service,
     # delete_order_service,
     # list_orders_by_user_service,
 )
@@ -91,27 +91,27 @@ def get_order(
         print(f"Unexpected error: {e}")
         raise HTTPException(status_code=500, detail="Unexpected error occurred.")
 
-# # --- Update Order ---
-# @router.put("/{order_id}", summary="Update order by ID", response_model=OrderOut)
-# def update_order(
-#     order_id: int,
-#     order_update: OrderUpdate,
-#     db: Session = Depends(get_db),
-#     current_user: TokenData = Depends(get_current_user),
-# ):
-#     try:
-#         order = get_order_service(db, order_id)
 
-#         if "can_update_order" not in current_user.permissions and order.user_id != current_user.user_id:
-#             raise HTTPException(status_code=403, detail="Access denied.")
+@router.put("/{order_id}", summary="Update order by ID", response_model=OrderOut)
+def update_order(
+    order_id: int,
+    order_update: OrderUpdate,
+    db: Session = Depends(get_db),
+    current_user: TokenData = Depends(get_current_user),
+):
+    try:
+        order = get_order_service(db, order_id)
 
-#         updated_order = update_order_service(db, order_id, order_update)
-#         return updated_order
-#     except HTTPException as e:
-#         raise e
-#     except Exception as e:
-#         print(f"Unexpected error: {e}")
-#         raise HTTPException(status_code=500, detail="Unexpected error occurred.")
+        if "can_update_order" not in current_user.permissions and order.user_id != current_user.user_id:
+            raise HTTPException(status_code=403, detail="Access denied.")
+
+        updated_order = update_order_service(db, order_id, order_update)
+        return updated_order
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        print(f"Unexpected error: {e}")
+        raise HTTPException(status_code=500, detail="Unexpected error occurred.")
 
 # # --- Delete Order ---
 # @router.delete("/{order_id}", summary="Delete order by ID", status_code=200)
@@ -133,18 +133,3 @@ def get_order(
 #     except Exception as e:
 #         print(f"Unexpected error: {e}")
 #         raise HTTPException(status_code=500, detail="Unexpected error occurred.")
-
-
-# # --- List Orders by Specific User ---
-# @router.get("/users/{user_id}/orders", summary="List orders by user", response_model=List[OrderOut])
-# def list_user_orders(
-#     user_id: int,
-#     db: Session = Depends(get_db),
-#     current_user: TokenData = Depends(permission_required("can_list_user_orders")),
-# ):
-#     try:
-#         return list_orders_by_user_service(db, user_id)
-#     except Exception as e:
-#         print(f"Unexpected error: {e}")
-#         raise HTTPException(status_code=500, detail="Unexpected error occurred.")
-
