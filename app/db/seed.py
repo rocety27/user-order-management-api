@@ -64,20 +64,32 @@ def seed_rules(db):
     admin_role = db.query(Role).filter(Role.name == "admin").first()
     customer_role = db.query(Role).filter(Role.name == "customer").first()
 
-    # Fetch all permissions at once
-    permission_lookup = {
-        perm.name: perm for perm in db.query(Permission).all()
-    }
+    # # Fetch all permissions at once
+    # permission_lookup = {
+    #     perm.name: perm for perm in db.query(Permission).all()
+    # }
 
     rules = [
-        # Admin - full order management
+        # Admin - User Management
+        Rule(role_name=admin_role.name, permission_name="can_create_user"),
+        Rule(role_name=admin_role.name, permission_name="can_list_users"),
+        Rule(role_name=admin_role.name, permission_name="can_get_user"),
+        Rule(role_name=admin_role.name, permission_name="can_update_user"),
+        Rule(role_name=admin_role.name, permission_name="can_delete_user"),
+        
+        # Admin - Order Management
         Rule(role_name=admin_role.name, permission_name="can_create_order"),
         Rule(role_name=admin_role.name, permission_name="can_list_orders"),
         Rule(role_name=admin_role.name, permission_name="can_get_order"),
         Rule(role_name=admin_role.name, permission_name="can_update_order"),
         Rule(role_name=admin_role.name, permission_name="can_delete_order"),
 
-        # Customer - limited order access
+        # Customer - Profile Management
+        Rule(role_name=customer_role.name, permission_name="can_get_own_profile"),
+        Rule(role_name=customer_role.name, permission_name="can_update_own_profile"),
+        
+        # Customer - Order Management
+        Rule(role_name=customer_role.name, permission_name="can_create_order"),
         Rule(role_name=customer_role.name, permission_name="can_get_own_orders"),
         Rule(role_name=customer_role.name, permission_name="can_get_own_order"),
     ]

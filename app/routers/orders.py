@@ -44,7 +44,7 @@ def create_order(
 @router.get("/", summary="List all orders", response_model=List[OrderOut])
 def list_orders(
     db: Session = Depends(get_db),
-    current_user: TokenData = Depends(permission_required("can_list_all_orders")),
+    current_user: TokenData = Depends(permission_required("can_list_orders")),
 ):
     try:
         return list_orders_service(db)
