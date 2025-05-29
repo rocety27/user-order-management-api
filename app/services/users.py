@@ -4,6 +4,7 @@ from app.db.crud.users import get_user_by_email, get_user_by_username, create_us
 from fastapi import HTTPException, status
 from app.utils.security import hash_password
 
+
 def create_user_service(db: Session, user_in: UserCreate):
     # Check if user exists by email or username
     if get_user_by_email(db, user_in.email):
@@ -42,3 +43,10 @@ def delete_user_service(db: Session, user_id: int):
 def update_user_service(db: Session, user_id: int, user_update: UserUpdate):
     return update_user_db(db, user_id, user_update)
 
+
+from app.db.crud.orders import get_orders_by_user_id
+from app.db.models import Order
+from typing import List
+
+def list_orders_by_user_service(db: Session, user_id: int) -> List[Order]:
+    return get_orders_by_user_id(db, user_id)

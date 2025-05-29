@@ -20,6 +20,7 @@ def get_all_orders(db: Session) -> list[Order]:
 
 
 def get_orders_by_user_id(db: Session, user_id: int) -> list[Order]:
+    print(user_id)
     return db.query(Order).filter(Order.user_id == user_id).all()
 
 
@@ -42,3 +43,4 @@ def delete_order_by_id(db: Session, order_id: int):
     if order:
         db.delete(order)
         db.commit()
+    return 

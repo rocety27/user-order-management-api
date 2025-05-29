@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from app.db.session import get_db
 
 from app.validators.users import UserCreate, UserUpdate, UserOut
+from app.validators.orders import OrderOut
 from app.validators.auth import TokenData
 
 from app.services.users import (
@@ -14,6 +15,7 @@ from app.services.users import (
     get_user_service,
     delete_user_service,
     update_user_service,
+    list_orders_by_user_service,
 )
 
 from app.utils.jwt import (
@@ -163,9 +165,19 @@ def delete_user(
         )
 
 
-# @router.get("/{user_id}/orders", summary="List orders by user (Admin only)")
-# def list_user_orders(
-#     user_id: int, current_user: TokenData = Depends(admin_required)
-# ):
-#     # Implement orders fetching logic here, admin only
-#     pass
+@router.get("/users/{user_id}/orders", summary="List orders by user", response_model=List[OrderOut])
+def list_user_orders(
+    user_id: int,
+    db: Session = Depends(get_db),
+    current_user: TokenData = Depends(permission_required("can_list_orders")),
+):
+    try:
+        orders = list_orders_by_user_service(db, user_id)
+        return orders
+    except Exception as e:
+        print(f"Unexpected error: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Unexpected error occurred.",
+        )
+

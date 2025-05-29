@@ -14,8 +14,7 @@ from app.services.orders import (
     list_my_orders_service,
     get_order_service,
     update_order_service,
-    # delete_order_service,
-    # list_orders_by_user_service,
+    delete_order_service,
 )
 
 from app.utils.jwt import (
@@ -113,23 +112,40 @@ def update_order(
         print(f"Unexpected error: {e}")
         raise HTTPException(status_code=500, detail="Unexpected error occurred.")
 
-# # --- Delete Order ---
-# @router.delete("/{order_id}", summary="Delete order by ID", status_code=200)
-# def delete_order(
-#     order_id: int,
-#     db: Session = Depends(get_db),
-#     current_user: TokenData = Depends(get_current_user),
-# ):
-#     try:
-#         order = get_order_service(db, order_id)
 
-#         if "can_delete_order" not in current_user.permissions and order.user_id != current_user.user_id:
-#             raise HTTPException(status_code=403, detail="Access denied.")
+@router.delete("/{order_id}", summary="Delete order by ID", status_code=200)
+def delete_order(
+    order_id: int,
+    db: Session = Depends(get_db),
+    current_user: TokenData = Depends(get_current_user),
+):
+    try:
+        # First check if order exists
+        order = get_order_service(db, order_id)
+        if not order:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Order with id {order_id} not found"
+            )
 
-#         delete_order_service(db, order_id)
-#         return JSONResponse(content={"message": f"Order {order_id} deleted."})
-#     except HTTPException as e:
-#         raise e
-#     except Exception as e:
-#         print(f"Unexpected error: {e}")
-#         raise HTTPException(status_code=500, detail="Unexpected error occurred.")
+        # Check permissions
+        if "can_delete_order" not in current_user.permissions and order.user_id != current_user.user_id:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Access denied."
+            )
+
+        # Delete order
+        delete_order_service(db, order_id)
+        return JSONResponse(
+            status_code=status.HTTP_200_OK,
+            content={"message": f"Order {order_id} deleted."}
+        )
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        print(f"Unexpected error: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Unexpected error occurred."
+        )
