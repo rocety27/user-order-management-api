@@ -97,7 +97,7 @@ def get_user(
     db: Session = Depends(get_db),
     current_user: TokenData = Depends(get_current_user),
 ):
-    if "get_any_user" not in current_user.permissions and current_user.user_id != user_id:
+    if "can_get_user" not in current_user.permissions and current_user.user_id != user_id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Access denied.",
@@ -121,7 +121,7 @@ def update_user(
     db: Session = Depends(get_db),
     current_user: TokenData = Depends(get_current_user),
 ):
-    if "update_any_user" not in current_user.permissions and current_user.user_id != user_id:
+    if "can_update_user" not in current_user.permissions and current_user.user_id != user_id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Access denied.",
@@ -142,7 +142,7 @@ def update_user(
 def delete_user(
     user_id: int,
     db: Session = Depends(get_db),
-    current_user: TokenData = Depends(permission_required("delete_user")),
+    current_user: TokenData = Depends(permission_required("can_delete_user")),
 ):
     try:
         delete_user_service(db, user_id)
