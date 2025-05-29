@@ -15,12 +15,12 @@ def create_order(db: Session, user_id: int, total_amount: float, status: str = "
     return order
 
 
-def get_orders_by_user_id(db: Session, user_id: int) -> list[Order]:
-    return db.query(Order).filter(Order.user_id == user_id).all()
-
-
 def get_all_orders(db: Session) -> list[Order]:
     return db.query(Order).all()
+
+
+def get_orders_by_user_id(db: Session, user_id: int) -> list[Order]:
+    return db.query(Order).filter(Order.user_id == user_id).all()
 
 
 def update_order_db(db: Session, order_id: int, order_update: OrderUpdate) -> Order:

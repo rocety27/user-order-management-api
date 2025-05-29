@@ -59,7 +59,7 @@ def list_users(
 @router.get("/me", summary="Get current user's profile", response_model=UserOut)
 def get_me(
     db: Session = Depends(get_db),
-    current_user: TokenData = Depends(get_current_user),
+    current_user: TokenData = Depends(permission_required("can_get_own_profile")),
 ):
     try:
         user = get_user_service(db, current_user.user_id)
@@ -77,7 +77,7 @@ def get_me(
 def update_me(
     user_update: UserUpdate,
     db: Session = Depends(get_db),
-    current_user: TokenData = Depends(get_current_user),
+    current_user: TokenData = Depends(permission_required("can_update_own_profile")),
 ):
     try:
         user = update_user_service(db, current_user.user_id, user_update)
@@ -90,7 +90,7 @@ def update_me(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Unexpected error occurred.",
         )
-
+    
 @router.get("/{user_id}", summary="Get user by ID", response_model=UserOut)
 def get_user(
     user_id: int,

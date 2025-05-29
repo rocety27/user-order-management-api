@@ -3,8 +3,8 @@ from fastapi import HTTPException, status
 
 from app.db.crud.orders import (
     create_order as create_order_db,
+    get_all_orders,
     # get_order_by_id,
-    # get_all_orders,
     # get_orders_by_user_id,
     # update_order_db,
     # delete_order_by_id
@@ -19,8 +19,8 @@ def create_order_service(db: Session, user_id: int, order_in: OrderCreate):
         status=order_in.status
     )
 
-# def list_orders_service(db: Session):
-#     return get_all_orders(db)
+def list_orders_service(db: Session):
+    return get_all_orders(db)
 
 
 # def list_my_orders_service(db: Session, user_id: int):

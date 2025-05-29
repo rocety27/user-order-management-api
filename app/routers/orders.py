@@ -10,7 +10,7 @@ from app.validators.auth import TokenData
 
 from app.services.orders import (
     create_order_service,
-    # list_orders_service,
+    list_orders_service,
     # get_order_service,
     # update_order_service,
     # delete_order_service,
@@ -25,7 +25,6 @@ from app.utils.jwt import (
 
 router = APIRouter()
 
-# --- Create Order ---
 @router.post("/", summary="Create a new order", response_model=OrderOut)
 def create_order(
     order_in: OrderCreate,
@@ -42,7 +41,17 @@ def create_order(
         raise HTTPException(status_code=500, detail="Unexpected error occurred.")
     
 
-# # --- Get Order by ID ---
+@router.get("/", summary="List all orders", response_model=List[OrderOut])
+def list_orders(
+    db: Session = Depends(get_db),
+    current_user: TokenData = Depends(permission_required("can_list_all_orders")),
+):
+    try:
+        return list_orders_service(db)
+    except Exception as e:
+        print(f"Unexpected error: {e}")
+        raise HTTPException(status_code=500, detail="Unexpected error occurred.")
+
 # @router.get("/{order_id}", summary="Get order by ID", response_model=OrderOut)
 # def get_order(
 #     order_id: int,
@@ -105,17 +114,6 @@ def create_order(
 #         print(f"Unexpected error: {e}")
 #         raise HTTPException(status_code=500, detail="Unexpected error occurred.")
 
-# # --- List All Orders ---
-# @router.get("/", summary="List all orders", response_model=List[OrderOut])
-# def list_orders(
-#     db: Session = Depends(get_db),
-#     current_user: TokenData = Depends(permission_required("can_list_all_orders")),
-# ):
-#     try:
-#         return list_orders_service(db)
-#     except Exception as e:
-#         print(f"Unexpected error: {e}")
-#         raise HTTPException(status_code=500, detail="Unexpected error occurred.")
 
 # # --- List Orders by Specific User ---
 # @router.get("/users/{user_id}/orders", summary="List orders by user", response_model=List[OrderOut])
