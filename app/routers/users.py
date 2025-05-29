@@ -63,6 +63,8 @@ def get_me(
 ):
     try:
         user = get_user_service(db, current_user.user_id)
+        if user is None:
+            raise HTTPException(status_code=404, detail="User not found.")
         return user
     except HTTPException as e:
         raise e
@@ -104,6 +106,8 @@ def get_user(
         )
     try:
         user = get_user_service(db, user_id)
+        if user is None:
+            raise HTTPException(status_code=404, detail="User not found.")
         return user
     except HTTPException as e:
         raise e

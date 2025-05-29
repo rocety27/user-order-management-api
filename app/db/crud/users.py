@@ -16,14 +16,13 @@ def get_all_users(db: Session):
     return db.query(User).all()
 
 def create_user(db: Session, username: str, email: str, hashed_password: str, role: str = "customer") -> User:
-    print("hehehehe1")
     user = User(
         username=username,
         email=email,
         hashed_password=hashed_password,
         role_name=role
     )
-    print("hehehehe2")
+
     db.add(user)
     db.commit()
     db.refresh(user)
