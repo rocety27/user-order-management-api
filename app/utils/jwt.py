@@ -9,7 +9,7 @@ from typing import Callable
 
 JWT_SECRET = os.getenv("JWT_SECRET", "your-secret")
 JWT_ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
-ACCESS_TOKEN_EXPIRE_MINUTES = 15
+ACCESS_TOKEN_EXPIRE_MINUTES = 30
 REFRESH_TOKEN_EXPIRE_DAYS = 7
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
@@ -18,6 +18,7 @@ def create_token(data: dict, expires_delta: datetime.timedelta) -> str:
     to_encode = data.copy()
     to_encode["exp"] = datetime.datetime.utcnow() + expires_delta
     return jwt.encode(to_encode, JWT_SECRET, algorithm=JWT_ALGORITHM)
+
 
 def create_access_token(user: dict) -> str:
     return create_token(
@@ -40,6 +41,7 @@ def create_refresh_token(user: dict) -> str:
         expires_delta=datetime.timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
     )
 
+
 def decode_token(token: str) -> dict:
     try:
         payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
@@ -50,6 +52,7 @@ def decode_token(token: str) -> dict:
             detail="Invalid or expired token",
             headers={"WWW-Authenticate": "Bearer"},
         )
+
 
 def get_current_user(token: str = Depends(oauth2_scheme)) -> TokenData:
     payload = decode_token(token)

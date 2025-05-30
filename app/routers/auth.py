@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from app.db.session import get_db
@@ -18,7 +18,6 @@ def login(
     if not user:
         raise HTTPException(status_code=401, detail="Invalid credentials")
 
-    # Fetch permissions for user's role from DB
     permissions = get_permissions_for_role(db, user.role_name)
 
     user_data = {

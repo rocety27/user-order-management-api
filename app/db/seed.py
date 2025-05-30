@@ -8,7 +8,7 @@ import os
 from dotenv import load_dotenv
 from sqlalchemy import text
 
-load_dotenv() # Load environment variables from .env file
+load_dotenv()
 
 def clear_tables(db):
     # Truncate with restart identity to reset auto-increment IDs
@@ -37,43 +37,55 @@ def seed_permissions(db):
         Permission(name="can_get_user"),
         Permission(name="can_update_user"),
         Permission(name="can_delete_user"),
-
         Permission(name="can_get_own_profile"),
         Permission(name="can_update_own_profile"),
+
+        # Order related permissions
+        Permission(name="can_create_order"),
+        Permission(name="can_list_orders"),
+        Permission(name="can_get_order"),
+        Permission(name="can_update_order"),
+        Permission(name="can_delete_order"),
+
+        Permission(name="can_get_own_orders"),
+        Permission(name="can_get_own_order"),
     ]
+
     for perm in permissions:
         existing = db.query(Permission).filter(Permission.name == perm.name).first()
         if not existing:
             db.add(perm)
+
     db.commit()
 
 
 def seed_rules(db):
-    # Fetch roles
     admin_role = db.query(Role).filter(Role.name == "admin").first()
     customer_role = db.query(Role).filter(Role.name == "customer").first()
 
-    # Fetch permissions
-    can_create_user = db.query(Permission).filter(Permission.name == "can_create_user").first()
-    can_list_users = db.query(Permission).filter(Permission.name == "can_list_users").first()
-    can_get_user = db.query(Permission).filter(Permission.name == "can_get_user").first()
-    can_update_user = db.query(Permission).filter(Permission.name == "can_update_user").first()
-    can_delete_user = db.query(Permission).filter(Permission.name == "can_delete_user").first()
-    
-    can_get_own_profile = db.query(Permission).filter(Permission.name == "can_get_own_profile").first()
-    can_update_own_profile = db.query(Permission).filter(Permission.name == "can_update_own_profile").first()
-
     rules = [
-        # Admin permissions - full user management
-        Rule(role_name=admin_role.name, permission_name=can_create_user.name),
-        Rule(role_name=admin_role.name, permission_name=can_list_users.name),
-        Rule(role_name=admin_role.name, permission_name=can_get_user.name),
-        Rule(role_name=admin_role.name, permission_name=can_update_user.name),
-        Rule(role_name=admin_role.name, permission_name=can_delete_user.name),
+        # Admin - User Management
+        Rule(role_name=admin_role.name, permission_name="can_create_user"),
+        Rule(role_name=admin_role.name, permission_name="can_list_users"),
+        Rule(role_name=admin_role.name, permission_name="can_get_user"),
+        Rule(role_name=admin_role.name, permission_name="can_update_user"),
+        Rule(role_name=admin_role.name, permission_name="can_delete_user"),
+        
+        # Admin - Order Management
+        Rule(role_name=admin_role.name, permission_name="can_create_order"),
+        Rule(role_name=admin_role.name, permission_name="can_list_orders"),
+        Rule(role_name=admin_role.name, permission_name="can_get_order"),
+        Rule(role_name=admin_role.name, permission_name="can_update_order"),
+        Rule(role_name=admin_role.name, permission_name="can_delete_order"),
 
-        # Customer permissions - maybe limited or none here
-        Rule(role_name=customer_role.name, permission_name=can_get_own_profile.name),
-        Rule(role_name=customer_role.name, permission_name=can_update_own_profile.name),
+        # Customer - Profile Management
+        Rule(role_name=customer_role.name, permission_name="can_get_own_profile"),
+        Rule(role_name=customer_role.name, permission_name="can_update_own_profile"),
+        
+        # Customer - Order Management
+        Rule(role_name=customer_role.name, permission_name="can_create_order"),
+        Rule(role_name=customer_role.name, permission_name="can_get_own_orders"),
+        Rule(role_name=customer_role.name, permission_name="can_get_own_order"),
     ]
 
     for rule in rules:
@@ -109,6 +121,25 @@ def seed_admin_user(db):
     print("Admin user created.")
 
 
+def seed_customer_users(db, n=3):
+    customer_role = db.query(Role).filter(Role.name == "customer").first()
+    
+    customer_usernames = [f"customer{x}" for x in range(1, n+1)]
+    customer_emails = [f"customer{x}@example.com" for x in range(1,n+1)]
+    customer_passwords = [f"password{x}" for x in range(1, n+1)]
+
+    for customer_username, customer_email, customer_password in zip(customer_usernames, customer_emails, customer_passwords):
+        customer_user = User(
+            username=customer_username,
+            email=customer_email,
+            hashed_password=hash_password(customer_password),
+            role_name=customer_role.name
+        )
+        db.add(customer_user)
+        db.commit()
+        print("Customer user created.")
+
+
 def seed_all():
     db = SessionLocal()
     try:
@@ -117,6 +148,8 @@ def seed_all():
         seed_permissions(db)
         seed_rules(db)
         seed_admin_user(db)
+        seed_customer_users(db, n=3)
+
     finally:
         db.close()
 
