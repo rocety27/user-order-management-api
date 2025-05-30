@@ -21,6 +21,7 @@ def get_all_orders(db: Session) -> list[Order]:
 
 def get_orders_by_user_id(db: Session, user_id: int) -> list[Order]:
     print(user_id)
+    print("HEHEHEHEHEHEH")
     return db.query(Order).filter(Order.user_id == user_id).all()
 
 

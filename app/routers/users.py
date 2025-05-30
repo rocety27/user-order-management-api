@@ -165,7 +165,7 @@ def delete_user(
         )
 
 
-@router.get("/users/{user_id}/orders", summary="List orders by user", response_model=List[OrderOut])
+@router.get("/{user_id}/orders", summary="List orders by user", response_model=List[OrderOut])
 def list_user_orders(
     user_id: int,
     db: Session = Depends(get_db),
