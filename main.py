@@ -12,9 +12,12 @@ app = FastAPI(
 app.include_router(auth.router, prefix="/auth", tags=["Auth"])
 app.include_router(users.router, prefix="/users", tags=["Users"])
 app.include_router(orders.router, prefix="/orders", tags=["Orders"])
+
+
 @app.on_event("startup")
 def on_startup():
     print("🚀 App starting up...")
+
 
 @app.on_event("shutdown")
 def on_shutdown():

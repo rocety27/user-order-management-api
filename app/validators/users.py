@@ -8,9 +8,11 @@ class UserCreate(BaseModel):
     password: Annotated[str, constr(min_length=6, max_length=255)]
     role: str = "customer"
 
+
 class UserUpdate(BaseModel):
     username: Optional[str] = Field(None, min_length=3, max_length=255)
     email: Optional[EmailStr] = None
+
 
 class UserOut(BaseModel):
     id: int

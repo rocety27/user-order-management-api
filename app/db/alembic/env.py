@@ -16,7 +16,6 @@ if config.config_file_name is not None:
 from app.db.base import Base
 
 def import_all_models():
-    # Correct the path to the models directory
     models_dir = os.path.join(os.path.dirname(__file__), "../models")
     models_dir = os.path.abspath(models_dir)  
     

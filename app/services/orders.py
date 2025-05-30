@@ -20,6 +20,7 @@ def create_order_service(db: Session, user_id: int, order_in: OrderCreate):
         status=order_in.status
     )
 
+
 def list_orders_service(db: Session):
     return get_all_orders(db)
 

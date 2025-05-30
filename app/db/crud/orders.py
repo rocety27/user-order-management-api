@@ -2,7 +2,6 @@ from sqlalchemy.orm import Session
 from app.db.models import Order
 from app.validators.orders import OrderUpdate
 
-
 def get_order_by_id(db: Session, order_id: int) -> Order | None:
     return db.query(Order).filter(Order.id == order_id).first()
 
@@ -20,8 +19,6 @@ def get_all_orders(db: Session) -> list[Order]:
 
 
 def get_orders_by_user_id(db: Session, user_id: int) -> list[Order]:
-    print(user_id)
-    print("HEHEHEHEHEHEH")
     return db.query(Order).filter(Order.user_id == user_id).all()
 
 

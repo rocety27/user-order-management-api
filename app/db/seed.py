@@ -8,7 +8,7 @@ import os
 from dotenv import load_dotenv
 from sqlalchemy import text
 
-load_dotenv() # Load environment variables from .env file
+load_dotenv()
 
 def clear_tables(db):
     # Truncate with restart identity to reset auto-increment IDs
@@ -60,14 +60,8 @@ def seed_permissions(db):
 
 
 def seed_rules(db):
-    # Fetch roles
     admin_role = db.query(Role).filter(Role.name == "admin").first()
     customer_role = db.query(Role).filter(Role.name == "customer").first()
-
-    # # Fetch all permissions at once
-    # permission_lookup = {
-    #     perm.name: perm for perm in db.query(Permission).all()
-    # }
 
     rules = [
         # Admin - User Management

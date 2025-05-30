@@ -43,6 +43,7 @@ def create_user(
             detail="Unexpected error occurred.",
         )
 
+
 @router.get("/", summary="List all users", response_model=List[UserOut])
 def list_users(
     db: Session = Depends(get_db),
@@ -57,6 +58,7 @@ def list_users(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Unexpected error occurred.",
         )
+
 
 @router.get("/me", summary="Get current user's profile", response_model=UserOut)
 def get_me(
@@ -77,6 +79,7 @@ def get_me(
             detail="Unexpected error occurred.",
         )
 
+
 @router.put("/me", summary="Update current user's profile", response_model=UserOut)
 def update_me(
     user_update: UserUpdate,
@@ -95,6 +98,7 @@ def update_me(
             detail="Unexpected error occurred.",
         )
     
+
 @router.get("/{user_id}", summary="Get user by ID", response_model=UserOut)
 def get_user(
     user_id: int,
@@ -120,6 +124,7 @@ def get_user(
             detail="Unexpected error occurred.",
         )
 
+
 @router.put("/{user_id}", summary="Update user by ID", response_model=UserOut)
 def update_user(
     user_id: int,
@@ -143,6 +148,7 @@ def update_user(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Unexpected error occurred.",
         )
+
 
 @router.delete("/{user_id}", summary="Delete user by ID", status_code=200)
 def delete_user(

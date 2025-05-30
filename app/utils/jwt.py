@@ -19,6 +19,7 @@ def create_token(data: dict, expires_delta: datetime.timedelta) -> str:
     to_encode["exp"] = datetime.datetime.utcnow() + expires_delta
     return jwt.encode(to_encode, JWT_SECRET, algorithm=JWT_ALGORITHM)
 
+
 def create_access_token(user: dict) -> str:
     return create_token(
         data={
@@ -40,6 +41,7 @@ def create_refresh_token(user: dict) -> str:
         expires_delta=datetime.timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
     )
 
+
 def decode_token(token: str) -> dict:
     try:
         payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
@@ -50,6 +52,7 @@ def decode_token(token: str) -> dict:
             detail="Invalid or expired token",
             headers={"WWW-Authenticate": "Bearer"},
         )
+
 
 def get_current_user(token: str = Depends(oauth2_scheme)) -> TokenData:
     payload = decode_token(token)

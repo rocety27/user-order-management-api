@@ -6,6 +6,7 @@ from app.db.models import Rule
 from datetime import timedelta
 from app.utils.security import verify_password
 
+
 def authenticate_user(db, username: str, password: str):
     user = get_user_by_username(db, username)
     if not user:
@@ -23,6 +24,7 @@ def get_permissions_for_role(db: Session, role_name: str) -> list[str]:
         .all()
     )
     return [perm.permission_name for perm in permissions]
+
 
 def create_token_for_user(db: Session, user):
     permissions = get_permissions_for_role(db, user.role_name)

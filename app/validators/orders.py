@@ -3,7 +3,6 @@ from pydantic import BaseModel, Field
 from decimal import Decimal
 from datetime import datetime
 
-
 class OrderCreate(BaseModel):
     total_amount: Annotated[Decimal, Field(gt=0, decimal_places=2)]
     status: Optional[Annotated[str, Field(max_length=50)]] = "pending"

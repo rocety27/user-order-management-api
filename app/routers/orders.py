@@ -120,7 +120,6 @@ def delete_order(
     current_user: TokenData = Depends(get_current_user),
 ):
     try:
-        # First check if order exists
         order = get_order_service(db, order_id)
         if not order:
             raise HTTPException(
@@ -128,14 +127,12 @@ def delete_order(
                 detail=f"Order with id {order_id} not found"
             )
 
-        # Check permissions
         if "can_delete_order" not in current_user.permissions and order.user_id != current_user.user_id:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Access denied."
             )
 
-        # Delete order
         delete_order_service(db, order_id)
         return JSONResponse(
             status_code=status.HTTP_200_OK,

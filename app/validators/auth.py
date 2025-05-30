@@ -6,6 +6,6 @@ class TokenData(BaseModel):
     role: str
     permissions: List[str]
     
-
+    
 class RefreshTokenRequest(BaseModel):
     refresh_token: str
